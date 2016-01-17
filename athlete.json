@@ -1,0 +1,37 @@
+{
+    "id": 11730283,
+    "username": "nicolas_seriot",
+    "resource_state": 3,
+    "firstname": "Nicolas",
+    "lastname": "Seriot",
+    "profile_medium": "https:\/\/graph.facebook.com\/v2.1\/10153171840540036\/picture?height=1000",
+    "profile": "https:\/\/graph.facebook.com\/v2.1\/10153171840540036\/picture?height=1000",
+    "city": "",
+    "state": "Vaud",
+    "country": "Switzerland",
+    "sex": "M",
+    "friend": null,
+    "follower": null,
+    "premium": false,
+    "created_at": "2015-10-12T12:40:24Z",
+    "updated_at": "2015-10-12T20:22:37Z",
+    "badge_type_id": 0,
+    "follower_count": 7,
+    "friend_count": 9,
+    "mutual_friend_count": 0,
+    "athlete_type": 1,
+    "date_preference": "%m\/%d\/%Y",
+    "measurement_preference": "meters",
+    "email": "facebook@seriot.ch",
+    "ftp": null,
+    "weight": 60,
+    "clubs": [
+    
+    ],
+    "bikes": [
+    
+    ],
+    "shoes": [
+    
+    ]
+}

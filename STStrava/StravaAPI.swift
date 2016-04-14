@@ -68,7 +68,6 @@ public struct Activity {
             let elevationGain = d["total_elevation_gain"] as? Double,
             let name = d["name"] as? String,
             let type = d["type"] as? String,
-            let locationCity = d["location_city"] as? String,
             let startDateLocale = dateFromString(d["start_date_local"] as? String),
             let athlete = Athlete(fromAthleteDictionary: d["athlete"] as? NSDictionary)
             else { return nil }
@@ -80,7 +79,7 @@ public struct Activity {
         self.elevationGain = elevationGain
         self.name = name
         self.type = type
-        self.locationCity = locationCity
+        self.locationCity = d["location_city"] as? String
         self.startDateLocale = startDateLocale
         self.athlete = athlete
     }

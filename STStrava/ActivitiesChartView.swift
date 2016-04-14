@@ -16,7 +16,7 @@ import UIKit
 let LEFT_SCALE_WIDTH : Double = 30
 let BOTTOM_SCALE_HEIGHT : Double = 30
 let MAX_SECONDS : Int = Int(60 * 60 * 2.5)
-let MAX_METERS : Int = 25000
+let MAX_METERS : Int = 30000
 let ACTIVITY_RADIUS = 4
 
 func textWidth(text:NSString, font:UIFont, context: NSStringDrawingContext?) -> CGFloat {
@@ -137,7 +137,8 @@ class ActivitiesChartView: UIView {
         CGContextMoveToPoint(context, CGFloat(LEFT_SCALE_WIDTH), self.frame.size.height - CGFloat(BOTTOM_SCALE_HEIGHT))
         CGContextAddLineToPoint(context, self.frame.size.width, self.frame.size.height - CGFloat(BOTTOM_SCALE_HEIGHT))
         
-        for var tick120Seconds = 10*60; tick120Seconds < MAX_SECONDS; tick120Seconds += (10*60) {
+        for tick120Seconds in (10*60).stride(through: MAX_SECONDS, by: 10*60) {
+//        for var tick120Seconds = 10*60; tick120Seconds < MAX_SECONDS; tick120Seconds += (10*60) {
             let isMajorTick = tick120Seconds % (30*60) == 0
             let x = xForSeconds(tick120Seconds)
             let tickStart = isMajorTick ? 0 : self.frame.size.height - CGFloat(BOTTOM_SCALE_HEIGHT)
@@ -167,7 +168,8 @@ class ActivitiesChartView: UIView {
         CGContextMoveToPoint(context, CGFloat(LEFT_SCALE_WIDTH), 0)
         CGContextAddLineToPoint(context, CGFloat(LEFT_SCALE_WIDTH), self.frame.size.height - CGFloat(BOTTOM_SCALE_HEIGHT))
         
-        for var tick1000Meters : Double = 1000; tick1000Meters < Double(MAX_METERS); tick1000Meters += 1000 {
+        for tick1000Meters in 1000.0.stride(to: Double(MAX_METERS), by: 1000) {
+//        for var tick1000Meters : Double = 1000; tick1000Meters < Double(MAX_METERS); tick1000Meters += 1000 {
             let isMajorTick = tick1000Meters % 5000 == 0
             let y = yForMeters(tick1000Meters)
             let tickStart = isMajorTick ? LEFT_SCALE_WIDTH - 10 : LEFT_SCALE_WIDTH - 5
@@ -207,7 +209,8 @@ class ActivitiesChartView: UIView {
         CGContextSetStrokeColorWithColor(context, UIColor.lightGrayColor().CGColor)
         CGContextSetLineWidth(context, 0.5)
         
-        for var pace : Double = 3.5; pace <= 7.0; pace += 0.5 {
+        for pace in 3.5.stride(through: 7.0, by: 0.5) {
+//        for var pace : Double = 3.5; pace <= 7.0; pace += 0.5 {
             // draw pace line
             let xMaxKm : CGFloat = CGFloat(xForSeconds(Int(pace * 60.0 * Double(MAX_METERS) / 1000.0)))
             CGContextMoveToPoint(context, CGFloat(LEFT_SCALE_WIDTH), self.frame.size.height - CGFloat(BOTTOM_SCALE_HEIGHT))
@@ -337,7 +340,8 @@ class ActivitiesChartView: UIView {
         // compute elevations
         
         var elevations : [Int] = []
-        for(var elevation = 0; elevation <= maxElevationMeters; elevation += 100) {
+        for elevation in 0.stride(through: maxElevationMeters, by: 100) {
+//        for(var elevation = 0; elevation <= maxElevationMeters; elevation += 100) {
             elevations.append(elevation)
         }
         elevations = elevations.reverse()

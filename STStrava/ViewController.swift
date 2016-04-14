@@ -38,31 +38,31 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate {
         self.connectButton = UIButton(type: UIButtonType.Custom)
         let connectImage = UIImage(named: "ConnectWithStrava")
         self.connectButton.setImage(connectImage, forState: UIControlState.Normal)
-        self.connectButton.addTarget(self, action:"connectButtonClicked:", forControlEvents: UIControlEvents.TouchUpInside)
+        self.connectButton.addTarget(self, action:#selector(ViewController.connectButtonClicked(_:)), forControlEvents: UIControlEvents.TouchUpInside)
         self.connectButton.translatesAutoresizingMaskIntoConstraints = false
         self.view.addSubview(connectButton!)
 
         self.disconnectButton = UIButton(type: UIButtonType.System)
         self.disconnectButton.setTitle("Disconnect", forState: .Normal)
-        self.disconnectButton.addTarget(self, action:"disconnectButtonClicked:", forControlEvents: UIControlEvents.TouchUpInside)
+        self.disconnectButton.addTarget(self, action:#selector(ViewController.disconnectButtonClicked(_:)), forControlEvents: UIControlEvents.TouchUpInside)
         self.disconnectButton.translatesAutoresizingMaskIntoConstraints = false
         self.view.addSubview(disconnectButton!)
 
         self.fetchDataButton = UIButton(type: UIButtonType.System)
         self.fetchDataButton.setTitle("Fetch Data", forState: .Normal)
-        self.fetchDataButton.addTarget(self, action:"fetchData:", forControlEvents: UIControlEvents.TouchUpInside)
+        self.fetchDataButton.addTarget(self, action:#selector(ViewController.fetchData(_:)), forControlEvents: UIControlEvents.TouchUpInside)
         self.fetchDataButton.translatesAutoresizingMaskIntoConstraints = false
         self.view.addSubview(fetchDataButton!)
 
         self.displayDataButton = UIButton(type: UIButtonType.System)
         self.displayDataButton.setTitle("Display Data", forState: .Normal)
-        self.displayDataButton.addTarget(self, action:"displayData:", forControlEvents: UIControlEvents.TouchUpInside)
+        self.displayDataButton.addTarget(self, action:#selector(ViewController.displayData(_:)), forControlEvents: UIControlEvents.TouchUpInside)
         self.displayDataButton.translatesAutoresizingMaskIntoConstraints = false
         self.view.addSubview(displayDataButton!)
 
         self.createGIFButton = UIButton(type: UIButtonType.System)
         self.createGIFButton.setTitle("Send GIF by Email", forState: .Normal)
-        self.createGIFButton.addTarget(self, action:"createAndSendGIF:", forControlEvents: UIControlEvents.TouchUpInside)
+        self.createGIFButton.addTarget(self, action:#selector(ViewController.createAndSendGIF(_:)), forControlEvents: UIControlEvents.TouchUpInside)
         self.createGIFButton.translatesAutoresizingMaskIntoConstraints = false
         self.view.addSubview(createGIFButton!)
 
@@ -221,7 +221,7 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate {
         imageView.image = image
         self.view.addSubview(imageView)
         
-        let tap = UITapGestureRecognizer(target:self, action:"imageViewTapped:")
+        let tap = UITapGestureRecognizer(target:self, action:#selector(ViewController.imageViewTapped(_:)))
         imageView.addGestureRecognizer(tap)
         imageView.userInteractionEnabled = true
     }

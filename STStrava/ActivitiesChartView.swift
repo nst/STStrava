@@ -15,8 +15,8 @@ import UIKit
 
 let LEFT_SCALE_WIDTH : Double = 30
 let BOTTOM_SCALE_HEIGHT : Double = 30
-let MAX_SECONDS : Int = Int(60 * 60 * 2.5)
-let MAX_METERS : Int = 30000
+let MAX_SECONDS : Int = Int(60 * 60 * 3.5)
+let MAX_METERS : Int = 43000
 let ACTIVITY_RADIUS = 4
 
 func textWidth(text:NSString, font:UIFont, context: NSStringDrawingContext?) -> CGFloat {
@@ -201,8 +201,8 @@ class ActivitiesChartView: UIView {
         
         let font = UIFont.systemFontOfSize(14)
         let attr = [NSFontAttributeName:font, NSForegroundColorAttributeName:UIColor.lightGrayColor()]
-        let yMetersForHorizontalDrawing : Double = 23000
-        let xMinutesForVerticalDrawing = 135
+        let yMetersForHorizontalDrawing : Double = 40000
+        let xMinutesForVerticalDrawing = 190
         
         CGContextSaveGState(context)
         
@@ -418,9 +418,12 @@ class ActivitiesChartView: UIView {
         
         let l1 = CGPointMake(p0.x + 10, p0.y + 5)
         let prettyDate = dateFormatter.stringFromDate(activity.date)
-        let dateAndPlace = "\(prettyDate), \(activity.locationCity!)"
-        dateAndPlace.drawAtPoint(l1, withAttributes: attr)
         
+        var dateAndPlace = "\(prettyDate)"
+        if let city = activity.locationCity {
+            dateAndPlace.appendContentsOf(", \(city)")
+        }
+        dateAndPlace.drawAtPoint(l1, withAttributes: attr)
         let l2 =  CGPointMake(l1.x, l1.y + LINE_HEIGHT)
         activity.name.drawAtPoint(l2, withAttributes: attr)
         

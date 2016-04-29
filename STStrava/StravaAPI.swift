@@ -133,21 +133,13 @@ public class StravaAPI {
     
     public func fetchAthlete(completionHandler: (Result<Athlete>) -> ()) {
         
-        let localFileName : String? = USE_LOCAL_FILES ? "athlete" : nil
-        
         let urlString = "https://www.strava.com/api/v3/athlete" + accessTokenURLSuffix()
         let url = NSURL(string: urlString)
         let request = NSURLRequest(URL: url!)
         
-        fetchJSON(request, localFileName: localFileName) { (result) -> () in
-            
-            switch result {
-            case let .Success(json):
-                guard let d = json as? NSDictionary else {
-                    completionHandler(.Failure(StravaAPI.BadJSON))
-                    return
-                }
-                
+        request.dr2_fetchTypedJSON([String:AnyObject].self) {
+            do {
+                let (_, d) = try $0()
                 if(d["errors"] != nil) {
                     completionHandler(.Failure(StravaAPI.StravaErrors(errors: d["errors"])))
                     return
@@ -158,32 +150,25 @@ public class StravaAPI {
                 } else {
                     completionHandler(.Failure(StravaAPI.BadJSON))
                 }
-                
-            case let .Failure(error):
-                completionHandler(.Failure(error))
+            } catch let e as NSError {
+                completionHandler(.Failure(e))
             }
         }
     }
     
     public func fetchActivities(completionHandler: (Result<[Activity]>) -> ()) {
         
-        let localFileName : String? = USE_LOCAL_FILES ? "activities" : nil
-        
-        let urlString = "https://www.strava.com/api/v3/activities" + accessTokenURLSuffix()
+        let urlString = "https://www.strava.com/api/v3/activities" + accessTokenURLSuffix() + "&per_page=1000"
         let url = NSURL(string: urlString)
         let request = NSURLRequest(URL: url!)
         
-        fetchJSON(request, localFileName: localFileName) { [unowned self] (result) -> () in
-            switch result {
-            case let .Success(jsonObject):
-                guard let a = jsonObject as? NSArray else {
-                    completionHandler(.Failure(StravaAPI.BadJSON))
-                    return
-                }
+        request.dr2_fetchTypedJSON([[String:AnyObject]].self) {
+            do {
+                let (_, a) = try $0()
                 let runActivities = self.sortedRunActivitiesFromJSONArray(a)
                 completionHandler(.Success(runActivities))
-            case let .Failure(error):
-                completionHandler(.Failure(error))
+            } catch let e as NSError {
+                completionHandler(.Failure(e))
             }
         }
     }
@@ -222,23 +207,17 @@ public class StravaAPI {
         let body = "client_id=\(clientID)&client_secret=\(clientSecret)&code=\(code)"
         request.HTTPBody = body.dataUsingEncoding(NSUTF8StringEncoding);
         
-        fetchJSON(request, localFileName: nil) { (result) -> () in
-            
-            switch result {
-            case let .Success(jsonObject):
-                guard let d = jsonObject as? NSDictionary else {
-                    completionBlock(.Failure(StravaAPI.BadJSON))
-                    return
-                }
-                
+        request.dr2_fetchTypedJSON([String:AnyObject].self) {
+            do {
+                let (r, d) = try $0()
+
                 guard let receivedExistingAccessToken : String = d["access_token"] as? String else {
                     completionBlock(.Failure(StravaAPI.BadJSON))
                     return
                 }
-                
                 completionBlock(.Success(receivedExistingAccessToken))
-            case let .Failure(error):
-                completionBlock(.Failure(error))
+            } catch let e as NSError {
+                completionBlock(.Failure(e))
             }
         }
     }
@@ -248,51 +227,6 @@ public class StravaAPI {
             return "?access_token=" + existingAccessToken
         }
         return ""
-    }
-    
-    private func fetchJSON(request: NSURLRequest, localFileName: String?, completionHandler: (Result<AnyObject>) -> ()) {
-        
-        if let localFileName = localFileName {
-            let path = NSBundle.mainBundle().pathForResource(localFileName, ofType: "json")
-            let data = NSData.init(contentsOfFile:path!)
-            
-            do {
-                let json = try NSJSONSerialization.JSONObjectWithData(data!, options:.MutableLeaves)
-                completionHandler(.Success(json))
-            } catch {
-                completionHandler(.Failure(StravaAPI.BadJSON))
-            }
-            return
-        }
-        
-        NSURLSession.sharedSession().dataTaskWithRequest(request, completionHandler: {
-            (data, response, error) -> Void in
-            
-            dispatch_async(dispatch_get_main_queue(),{
-                
-                guard let data = data else {
-                    completionHandler(.Failure(StravaAPI.NoData))
-                    return
-                }
-                
-                guard let httpResponse = response as? NSHTTPURLResponse else {
-                    completionHandler(.Failure(StravaAPI.GenericError))
-                    return
-                }
-                
-                if(httpResponse.statusCode != 200) {
-                    completionHandler(.Failure(StravaAPI.BadHTTPStatus(status: httpResponse.statusCode)))
-                    return
-                }
-                
-                do {
-                    let jsonObject = try NSJSONSerialization.JSONObjectWithData(data, options:.MutableContainers)
-                    completionHandler(.Success(jsonObject))
-                } catch {
-                    completionHandler(.Failure(StravaAPI.BadJSON))
-                }
-            })
-        }).resume()
     }
     
     private func sortedRunActivitiesFromJSONArray(a:NSArray) -> [Activity] {
@@ -309,20 +243,13 @@ public class StravaAPI {
         let url = NSURL(string: urlString)
         let request = NSURLRequest(URL: url!)
         
-        fetchJSON(request, localFileName: nil) { [unowned self] (result) -> () in
-            switch result {
-            case let .Success(jsonObject):
-                guard let a = jsonObject as? NSArray else {
-                    completionHandler(.Failure(StravaAPI.BadJSON))
-                    return
-                }
-                
+        request.dr2_fetchTypedJSON([[String:AnyObject]].self) {
+            do {
+                let (_, a) = try $0()
                 let runActivitiesFromSpecificFriend = self.sortedRunActivitiesFromJSONArray(a).filter{ $0.athlete?.id == athleteID }
-                
                 completionHandler(.Success(runActivitiesFromSpecificFriend))
-                
-            case let .Failure(error):
-                completionHandler(.Failure(error))
+            } catch let e as NSError {
+                completionHandler(.Failure(e))
             }
         }
     }
@@ -333,14 +260,9 @@ public class StravaAPI {
         let url = NSURL(string: urlString)
         let request = NSURLRequest(URL: url!)
         
-        fetchJSON(request, localFileName: nil) { (result) -> () in
-            
-            switch result {
-            case let .Success(jsonObject):
-                guard let d = jsonObject as? NSDictionary else {
-                    completionHandler(.Failure(StravaAPI.BadJSON))
-                    return
-                }
+        request.dr2_fetchTypedJSON(NSDictionary.self) {
+            do {
+                let (_, d) = try $0()
                 
                 if let activity = Activity(fromActivityDictionary: d) {
                     completionHandler(.Success(activity))
@@ -348,8 +270,8 @@ public class StravaAPI {
                     completionHandler(.Failure(StravaAPI.BadJSON))
                 }
                 
-            case let .Failure(error):
-                completionHandler(.Failure(error))
+            } catch let e as NSError {
+                completionHandler(.Failure(e))
             }
         }
     }

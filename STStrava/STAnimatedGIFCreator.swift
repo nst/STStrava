@@ -17,7 +17,6 @@ public class STAnimatedGIFCreator {
     init?(destinationPath: String?, loop: Bool) {
         
         guard let existingPath = destinationPath else {
-            imageDestination = nil
             return nil
         }
         

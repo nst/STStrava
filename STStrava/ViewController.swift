@@ -175,11 +175,27 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate {
     @IBAction func disconnectButtonClicked(sender: UIButton!) {
         NSUserDefaults.standardUserDefaults().removeObjectForKey("StravaAccessToken")
         
-        self.stravaAPI.forgetAccessToken()
-        self.updateDisplayAccordingToStravaAPIConnection()
+        let actionSheetController: UIAlertController = UIAlertController(title: "Confirmation", message: "Do you really want to disconnect?", preferredStyle: .ActionSheet)
+        
+        let cancelAction: UIAlertAction = UIAlertAction(title: "Cancel", style: .Cancel) { action -> Void in
+        }
+
+        let disconnectAction = UIAlertAction(title: "Disconnect", style: .Destructive) { action -> Void in
+            self.stravaAPI.forgetAccessToken()
+            self.updateDisplayAccordingToStravaAPIConnection()
+        }
+
+        actionSheetController.addAction(cancelAction)
+        actionSheetController.addAction(disconnectAction)
+        
+        actionSheetController.popoverPresentationController?.sourceView = sender as UIView
+        
+        self.presentViewController(actionSheetController, animated: true, completion: nil)
     }
     
     @IBAction func fetchData(sender: UIButton!) {
+        
+        self.statusLabel.text = ""
         
         self.stravaAPI.fetchAthlete { [unowned self] (result) -> () in
             
@@ -198,12 +214,13 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate {
                         self.updateDisplayAccordingToStravaAPIConnection()
 
                     case let .Failure(error):
-                        print(error)
+                        
+                        self.statusLabel.text = error.localizedDescription
                     }
                 }
                 
             case let .Failure(error):
-                print(error)
+                self.statusLabel.text = error.localizedDescription
             }
         }
     }

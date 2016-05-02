@@ -11,7 +11,7 @@ import Foundation
 let USE_LOCAL_FILES : Bool = false
 
 public enum Result<T> {
-    case Failure(ErrorType)
+    case Failure(NSError)
     case Success(T)
 }
 
@@ -140,15 +140,17 @@ public class StravaAPI {
         request.dr2_fetchTypedJSON([String:AnyObject].self) {
             do {
                 let (_, d) = try $0()
-                if(d["errors"] != nil) {
-                    completionHandler(.Failure(StravaAPI.StravaErrors(errors: d["errors"])))
+                if let errors = d["errors"] {
+                    let e = NSError(domain: "STStrava", code: StravaAPI.BadJSON._code, userInfo: [NSLocalizedDescriptionKey:String(errors)])
+                    completionHandler(.Failure(e))
                     return
                 }
                 
                 if let athlete = Athlete(fromAthleteDictionary: d) {
                     completionHandler(.Success(athlete))
                 } else {
-                    completionHandler(.Failure(StravaAPI.BadJSON))
+                    let e = NSError(domain: "STStrava", code: StravaAPI.BadJSON._code, userInfo: [NSLocalizedDescriptionKey:"Bad JSON"])
+                    completionHandler(.Failure(e))
                 }
             } catch let e as NSError {
                 completionHandler(.Failure(e))
@@ -158,7 +160,7 @@ public class StravaAPI {
     
     public func fetchActivities(completionHandler: (Result<[Activity]>) -> ()) {
         
-        let urlString = "https://www.strava.com/api/v3/activities" + accessTokenURLSuffix() + "&per_page=1000"
+        let urlString = "https://www.strava.com/api/v3/activities" + accessTokenURLSuffix() + "&per_page=200"
         let url = NSURL(string: urlString)
         let request = NSURLRequest(URL: url!)
         
@@ -167,8 +169,26 @@ public class StravaAPI {
                 let (_, a) = try $0()
                 let runActivities = self.sortedRunActivitiesFromJSONArray(a)
                 completionHandler(.Success(runActivities))
-            } catch let e as NSError {
-                completionHandler(.Failure(e))
+            } catch let DRError.Error(r, nsError) {
+                
+                // try to read a Strava error
+                
+                if let data = r.data,
+                    d = try? NSJSONSerialization.JSONObjectWithData(data, options: []),
+                    message = d["message"] as? String,
+                    errors = d["errors"] as? [[String:AnyObject]] {
+                    print("-- ", d)
+                
+                    // build a custom NSError
+                    let userInfo = [NSLocalizedDescriptionKey:"\(message) - \(errors)"]
+                    let e = NSError(domain: "Strava", code: 0, userInfo: userInfo)
+                    completionHandler(.Failure(e))
+                    return
+                }
+                
+                completionHandler(.Failure(nsError))
+            } catch {
+                assertionFailure()
             }
         }
     }
@@ -209,10 +229,11 @@ public class StravaAPI {
         
         request.dr2_fetchTypedJSON([String:AnyObject].self) {
             do {
-                let (r, d) = try $0()
+                let (_, d) = try $0()
 
-                guard let receivedExistingAccessToken : String = d["access_token"] as? String else {
-                    completionBlock(.Failure(StravaAPI.BadJSON))
+                guard let receivedExistingAccessToken = d["access_token"] as? String else {
+                    let e = NSError(domain: "STStrava", code: StravaAPI.BadJSON._code, userInfo: [NSLocalizedDescriptionKey:"Bad JSON"])
+                    completionBlock(.Failure(e))
                     return
                 }
                 completionBlock(.Success(receivedExistingAccessToken))
@@ -267,7 +288,8 @@ public class StravaAPI {
                 if let activity = Activity(fromActivityDictionary: d) {
                     completionHandler(.Success(activity))
                 } else {
-                    completionHandler(.Failure(StravaAPI.BadJSON))
+                    let e = NSError(domain: "STStrava", code: StravaAPI.BadJSON._code, userInfo: [NSLocalizedDescriptionKey:"Bad JSON"])
+                    completionHandler(.Failure(e))
                 }
                 
             } catch let e as NSError {

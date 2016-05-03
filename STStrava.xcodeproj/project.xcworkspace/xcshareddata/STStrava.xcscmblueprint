@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "1E533E32EE941F223B977F26578B8A0B2AAD4754",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "F881BDCD7F90E74E4D29D28458E34DFFDF311661" : 0,
+    "1E533E32EE941F223B977F26578B8A0B2AAD4754" : 0
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "1B18755D-CD62-448D-B5BC-266952347F9F",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "F881BDCD7F90E74E4D29D28458E34DFFDF311661" : "STStrava\/submodules\/HTTPRequests\/",
+    "1E533E32EE941F223B977F26578B8A0B2AAD4754" : "STStrava\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "STStrava",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "STStrava.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/nst\/STStrava",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "1E533E32EE941F223B977F26578B8A0B2AAD4754"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/nst\/HTTPRequests",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "F881BDCD7F90E74E4D29D28458E34DFFDF311661"
+    }
+  ]
+}

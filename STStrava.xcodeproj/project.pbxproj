@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		033E87161CD8844E009DD86A /* HTTPRequests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 033E87151CD8844E009DD86A /* HTTPRequests.swift */; };
+		033E87181CD886B3009DD86A /* README.md in Sources */ = {isa = PBXBuildFile; fileRef = 033E87171CD886B3009DD86A /* README.md */; };
 		03449C6A1BF4F3EB0037BC6D /* ActivitiesChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03449C691BF4F3EB0037BC6D /* ActivitiesChartView.swift */; };
 		03693EBA1C14F52600E05BA8 /* activities.gif in Resources */ = {isa = PBXBuildFile; fileRef = 03693EB91C14F52600E05BA8 /* activities.gif */; };
 		03979F121BF9255200C6DF09 /* activities.json in Resources */ = {isa = PBXBuildFile; fileRef = 03979F111BF9255200C6DF09 /* activities.json */; };
@@ -23,6 +24,7 @@
 
 /* Begin PBXFileReference section */
 		033E87151CD8844E009DD86A /* HTTPRequests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = HTTPRequests.swift; path = submodules/HTTPRequests/HTTPRequests/HTTPRequests.swift; sourceTree = "<group>"; };
+		033E87171CD886B3009DD86A /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		03449C691BF4F3EB0037BC6D /* ActivitiesChartView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActivitiesChartView.swift; sourceTree = "<group>"; };
 		03693EB91C14F52600E05BA8 /* activities.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = activities.gif; sourceTree = "<group>"; };
 		03979F111BF9255200C6DF09 /* activities.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = activities.json; sourceTree = "<group>"; };
@@ -68,6 +70,7 @@
 		03B4D5B91BEBFB74009FA801 = {
 			isa = PBXGroup;
 			children = (
+				033E87171CD886B3009DD86A /* README.md */,
 				033E87131CD88438009DD86A /* submodules */,
 				03693EB91C14F52600E05BA8 /* activities.gif */,
 				03BFB0131C13A9B7003FD9B1 /* athlete.json */,
@@ -177,6 +180,7 @@
 				03449C6A1BF4F3EB0037BC6D /* ActivitiesChartView.swift in Sources */,
 				03C776261BF525DA00A135BA /* StravaAPI.swift in Sources */,
 				03979F1E1C010E3E00C6DF09 /* STAnimatedGIFCreator.swift in Sources */,
+				033E87181CD886B3009DD86A /* README.md in Sources */,
 				033E87161CD8844E009DD86A /* HTTPRequests.swift in Sources */,
 				03B4D5C81BEBFB74009FA801 /* ViewController.swift in Sources */,
 				03B4D5C61BEBFB74009FA801 /* AppDelegate.swift in Sources */,

@@ -138,7 +138,6 @@ class ActivitiesChartView: UIView {
         CGContextAddLineToPoint(context, self.frame.size.width, self.frame.size.height - CGFloat(BOTTOM_SCALE_HEIGHT))
         
         for tick120Seconds in (10*60).stride(through: MAX_SECONDS, by: 10*60) {
-//        for var tick120Seconds = 10*60; tick120Seconds < MAX_SECONDS; tick120Seconds += (10*60) {
             let isMajorTick = tick120Seconds % (30*60) == 0
             let x = xForSeconds(tick120Seconds)
             let tickStart = isMajorTick ? 0 : self.frame.size.height - CGFloat(BOTTOM_SCALE_HEIGHT)
@@ -151,7 +150,9 @@ class ActivitiesChartView: UIView {
             
             let minutesString = String(format: "%02d", minutes)
             
-            drawText(context, x: CGFloat(x-15), y: CGFloat(self.frame.size.height - CGFloat(BOTTOM_SCALE_HEIGHT) + 10), text: "\(hours):\(minutesString)", rotationAngle: 0)
+            if isMajorTick {
+                drawText(context, x: CGFloat(x-15), y: CGFloat(self.frame.size.height - CGFloat(BOTTOM_SCALE_HEIGHT) + 10), text: "\(hours):\(minutesString)", rotationAngle: 0)
+            }
         }
         
         CGContextStrokePath(context)

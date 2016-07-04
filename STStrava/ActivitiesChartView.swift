@@ -15,8 +15,8 @@ import UIKit
 
 let LEFT_SCALE_WIDTH : Double = 30
 let BOTTOM_SCALE_HEIGHT : Double = 30
-let MAX_SECONDS : Int = Int(60 * 60 * 3.5)
-let MAX_METERS : Int = 43000
+let MAX_SECONDS : Int = Int(60 * 60 * 5.5)
+let MAX_METERS : Int = 45000
 let ACTIVITY_RADIUS = 4
 
 func textWidth(text:NSString, font:UIFont, context: NSStringDrawingContext?) -> CGFloat {

@@ -101,12 +101,25 @@ class ActivitiesChartView: UIView {
     }
     
     func colorForElevationGain(elevationMeters:Double) -> UIColor {
-        let maxElevationMeters : Int = self.maxElevationMetersRounded
-        let r = min(elevationMeters, Double(maxElevationMeters)) / Double(maxElevationMeters)
-        let g = 1.0 - r
-        let b = 0.0
+//        let maxElevationMeters : Int = self.maxElevationMetersRounded
+//        let r = min(elevationMeters, Double(maxElevationMeters)) / Double(maxElevationMeters)
+//        let g = 1.0 - r
+//        let b = 0.0
+//        
+//        return UIColor(red: CGFloat(r), green: CGFloat(g), blue: CGFloat(b), alpha: CGFloat(1.0))
         
-        return UIColor(red: CGFloat(r), green: CGFloat(g), blue: CGFloat(b), alpha: CGFloat(1.0))
+        if elevationMeters > 1500 {
+            return UIColor(red: 255.0/255.0, green: 59.0/255.0, blue: 48.0/255.0, alpha: 1.0)
+        } else if elevationMeters > 1000 {
+            return UIColor(red: 255.0/255.0, green: 149.0/255.0, blue: 0.0/255.0, alpha: 1.0)
+        } else if elevationMeters > 500 {
+            return UIColor(red: 255.0/255.0, green: 204.0/255.0, blue: 0.0/255.0, alpha: 1.0)
+        } else if elevationMeters > 250 {
+            return UIColor(red: 76.0/255.0, green: 217.0/255.0, blue: 100.0/255.0, alpha: 1.0)
+        } else {
+            return UIColor(red: 90.0/255.0, green: 200.0/255.0, blue: 250.0/255.0, alpha: 1.0)
+        }
+        
     }
     
     func drawText(context : CGContext?, x: CGFloat, y: CGFloat, text : String, rotationAngle : CGFloat) {

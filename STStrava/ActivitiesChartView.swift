@@ -15,8 +15,8 @@ import UIKit
 
 let LEFT_SCALE_WIDTH : Double = 30
 let BOTTOM_SCALE_HEIGHT : Double = 30
-let MAX_SECONDS : Int = Int(60 * 60 * 3.5)
-let MAX_METERS : Int = 43000
+let MAX_SECONDS : Int = Int(60 * 60 * 6.5)
+let MAX_METERS : Int = 50000
 let ACTIVITY_RADIUS = 4
 
 func textWidth(text:NSString, font:UIFont, context: NSStringDrawingContext?) -> CGFloat {
@@ -109,7 +109,7 @@ class ActivitiesChartView: UIView {
         return UIColor(red: CGFloat(r), green: CGFloat(g), blue: CGFloat(b), alpha: CGFloat(1.0))
     }
     
-    func drawText(context : CGContext?, x: CGFloat, y: CGFloat, text : String, rotationAngle : CGFloat) {
+    func drawText(context : CGContext, x: CGFloat, y: CGFloat, text : String, rotationAngle : CGFloat) {
         
         let font = UIFont.systemFontOfSize(14)
         let attr = [NSFontAttributeName:font, NSForegroundColorAttributeName:UIColor.blackColor()]
@@ -128,7 +128,7 @@ class ActivitiesChartView: UIView {
         CGContextRestoreGState(context)
     }
     
-    func drawBottomScale(context: CGContext?) {
+    func drawBottomScale(context: CGContext) {
         
         CGContextSaveGState(context)
         
@@ -160,7 +160,7 @@ class ActivitiesChartView: UIView {
         CGContextRestoreGState(context)
     }
     
-    func drawLeftScale(context: CGContext?) {
+    func drawLeftScale(context: CGContext) {
         
         CGContextSaveGState(context)
         
@@ -198,7 +198,7 @@ class ActivitiesChartView: UIView {
         CGContextRestoreGState(context)
     }
     
-    func drawPaces(context: CGContext?) {
+    func drawPaces(context: CGContext) {
         
         let font = UIFont.systemFontOfSize(14)
         let attr = [NSFontAttributeName:font, NSForegroundColorAttributeName:UIColor.lightGrayColor()]
@@ -247,7 +247,7 @@ class ActivitiesChartView: UIView {
         CGContextRestoreGState(context)
     }
     
-    func drawActivityDot(context: CGContext?, activity: Activity, highlight: Bool) {
+    func drawActivityDot(context: CGContext, activity: Activity, highlight: Bool) {
         
         CGContextSaveGState(context)
         
@@ -270,7 +270,7 @@ class ActivitiesChartView: UIView {
         CGContextRestoreGState(context)
     }
     
-    func drawTitleAndSubtitles(context: CGContext?) {
+    func drawTitleAndSubtitles(context: CGContext) {
         
         guard let existingAthlete = athlete else {
             return
@@ -325,7 +325,7 @@ class ActivitiesChartView: UIView {
         CGContextRestoreGState(context)
     }
     
-    func drawElevationLegend(context: CGContext?) {
+    func drawElevationLegend(context: CGContext) {
         
         guard athlete != nil else {
             return
@@ -394,7 +394,7 @@ class ActivitiesChartView: UIView {
         CGContextRestoreGState(context)
     }
     
-    func drawLegendWithActivityDetails(context: CGContext?, activity: Activity) {
+    func drawLegendWithActivityDetails(context: CGContext, activity: Activity) {
         
         let font = UIFont.systemFontOfSize(14)
         let attr = [NSFontAttributeName:font, NSForegroundColorAttributeName:UIColor.blackColor()]
@@ -437,7 +437,8 @@ class ActivitiesChartView: UIView {
         drawInContext(context)
         let image = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
-        return image
+        guard let existingImage = image else { assertionFailure(); return UIImage() }
+        return existingImage;
     }
     
     func setupGlobalStatsFromActivities(activities: [Activity]) {

@@ -138,7 +138,7 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate {
         
         let path = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0]
         let pathURL = NSURL(fileURLWithPath: path)
-        let fileURL = pathURL.URLByAppendingPathComponent("activities.gif")
+        guard let fileURL = pathURL.URLByAppendingPathComponent("activities.gif") else { return }
         guard let fileURLPath = fileURL.path else { return }
         
         let gifCreator = STAnimatedGIFCreator(destinationPath: fileURLPath, loop: false)
@@ -283,6 +283,7 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate {
     }
     
     func mailComposeController(controller: MFMailComposeViewController, didFinishWithResult result: MFMailComposeResult, error: NSError?) {
+        /*
         switch result.rawValue {
         case MFMailComposeResultCancelled.rawValue:
             print("Mail cancelled")
@@ -296,5 +297,6 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate {
             break
         }
         controller.dismissViewControllerAnimated(true, completion: nil)
+         */
     }
 }

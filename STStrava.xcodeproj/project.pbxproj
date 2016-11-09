@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		033E87161CD8844E009DD86A /* HTTPRequests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 033E87151CD8844E009DD86A /* HTTPRequests.swift */; };
-		033E87181CD886B3009DD86A /* README.md in Sources */ = {isa = PBXBuildFile; fileRef = 033E87171CD886B3009DD86A /* README.md */; };
 		03449C6A1BF4F3EB0037BC6D /* ActivitiesChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03449C691BF4F3EB0037BC6D /* ActivitiesChartView.swift */; };
 		03693EBA1C14F52600E05BA8 /* activities.gif in Resources */ = {isa = PBXBuildFile; fileRef = 03693EB91C14F52600E05BA8 /* activities.gif */; };
 		03979F121BF9255200C6DF09 /* activities.json in Resources */ = {isa = PBXBuildFile; fileRef = 03979F111BF9255200C6DF09 /* activities.json */; };
@@ -135,6 +134,7 @@
 				TargetAttributes = {
 					03B4D5C11BEBFB74009FA801 = {
 						CreatedOnToolsVersion = 7.0.1;
+						LastSwiftMigration = 0800;
 					};
 				};
 			};
@@ -180,7 +180,6 @@
 				03449C6A1BF4F3EB0037BC6D /* ActivitiesChartView.swift in Sources */,
 				03C776261BF525DA00A135BA /* StravaAPI.swift in Sources */,
 				03979F1E1C010E3E00C6DF09 /* STAnimatedGIFCreator.swift in Sources */,
-				033E87181CD886B3009DD86A /* README.md in Sources */,
 				033E87161CD8844E009DD86A /* HTTPRequests.swift in Sources */,
 				03B4D5C81BEBFB74009FA801 /* ViewController.swift in Sources */,
 				03B4D5C61BEBFB74009FA801 /* AppDelegate.swift in Sources */,
@@ -298,6 +297,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = ch.seriot.STStrava;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -309,6 +309,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = ch.seriot.STStrava;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};

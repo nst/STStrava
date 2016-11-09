@@ -10,7 +10,7 @@ import UIKit
 import ImageIO
 import MobileCoreServices
 
-public class STAnimatedGIFCreator {
+open class STAnimatedGIFCreator {
     
     let imageDestination : CGImageDestination?
     
@@ -21,7 +21,7 @@ public class STAnimatedGIFCreator {
         }
         
         imageDestination = CGImageDestinationCreateWithURL(
-            NSURL(fileURLWithPath: existingPath),
+            URL(fileURLWithPath: existingPath) as CFURL,
             kUTTypeGIF,
             0,
             nil)
@@ -31,12 +31,12 @@ public class STAnimatedGIFCreator {
         let loopCount = loop ? 0 : 1
         let gifProperties = [ kCGImagePropertyGIFDictionary as String : [kCGImagePropertyGIFLoopCount as String:loopCount] ]
         
-        CGImageDestinationSetProperties(imageDestination!, gifProperties)
+        CGImageDestinationSetProperties(imageDestination!, gifProperties as CFDictionary?)
     }
     
-    func addImage(image : UIImage, duration : Double) {
+    func addImage(_ image : UIImage, duration : Double) {
         let frameProperties : Dictionary = [ kCGImagePropertyGIFDictionary as String : [kCGImagePropertyGIFDelayTime as String:duration] ]
-        CGImageDestinationAddImage(imageDestination!, image.CGImage!, frameProperties)
+        CGImageDestinationAddImage(imageDestination!, image.cgImage!, frameProperties as CFDictionary?)
     }
     
     func writeFile() -> Bool {

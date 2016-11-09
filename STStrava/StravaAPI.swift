@@ -11,16 +11,16 @@ import Foundation
 let USE_LOCAL_FILES : Bool = false
 
 public enum Result<T> {
-    case Failure(NSError)
-    case Success(T)
+    case failure(NSError)
+    case success(T)
 }
 
-func dateFromString(dateString: String?) -> NSDate? {
+func dateFromString(_ dateString: String?) -> Date? {
     guard let existringDateString = dateString else { return nil }
-    let dateFormatter = NSDateFormatter()
-    dateFormatter.locale = NSLocale(localeIdentifier: "en_US_POSIX")
+    let dateFormatter = DateFormatter()
+    dateFormatter.locale = Locale(identifier: "en_US_POSIX")
     dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZ"
-    return dateFormatter.dateFromString(existringDateString)
+    return dateFormatter.date(from: existringDateString)
 }
 
 public struct Athlete {
@@ -30,7 +30,7 @@ public struct Athlete {
     let lastname: String?
     let profileMedium: String?
     
-    init?(fromAthleteDictionary d: NSDictionary?) {
+    init?(fromAthleteDictionary d: [String:AnyObject]?) {
         
         guard let d = d else { return nil }
         guard let id = d["id"] as? Int else { return nil }
@@ -46,17 +46,17 @@ public struct Athlete {
 
 public struct Activity {
     let id: Int
-    let date: NSDate
+    let date: Date
     let meters: Double
     let seconds: Int
     let elevationGain: Double
     let name: String
     let type: String
     let locationCity: String?
-    let startDateLocale: NSDate?
+    let startDateLocale: Date?
     let athlete: Athlete?
     
-    init?(fromActivityDictionary d: NSDictionary?) {
+    init?(fromActivityDictionary d: [String:AnyObject]?) {
         
         guard let d = d else { return nil }
         
@@ -69,7 +69,7 @@ public struct Activity {
             let name = d["name"] as? String,
             let type = d["type"] as? String,
             let startDateLocale = dateFromString(d["start_date_local"] as? String),
-            let athlete = Athlete(fromAthleteDictionary: d["athlete"] as? NSDictionary)
+            let athlete = Athlete(fromAthleteDictionary: d["athlete"] as? [String:AnyObject])
             else { return nil }
         
         self.id = id
@@ -85,20 +85,20 @@ public struct Activity {
     }
 }
 
-public class StravaAPI {
+open class StravaAPI {
     
-    public enum StravaAPI : ErrorType {
-        case BadURL(urlString: String)
-        case BadHTTPStatus(status: Int)
-        case BadJSON
-        case NoData
-        case StravaErrors(errors: AnyObject?)
-        case GenericError
+    public enum StravaAPI : Error {
+        case badURL(urlString: String)
+        case badHTTPStatus(status: Int)
+        case badJSON
+        case noData
+        case stravaErrors(errors: AnyObject?)
+        case genericError
     }
     
-    private var clientID : String
-    private var clientSecret : String
-    private(set) var accessToken : String?
+    fileprivate var clientID : String
+    fileprivate var clientSecret : String
+    fileprivate(set) var accessToken : String?
     
     // find clientID and clientSecret on https://www.strava.com/settings/api
     public required init(clientID: String, clientSecret: String, storedAccessToken: String?) {
@@ -106,17 +106,16 @@ public class StravaAPI {
         self.clientSecret = clientSecret
         self.accessToken = storedAccessToken
         
-        NSNotificationCenter.defaultCenter().addObserverForName("CodeWasReceived", object: nil, queue: nil) { [unowned self] (notification) -> Void in
-            guard let existingCode = notification.userInfo?["code"] as? String else { return }
+        NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: "CodeWasReceived"), object: nil, queue: nil) { [unowned self] (notification) -> Void in
+            guard let existingCode = (notification as NSNotification).userInfo?["code"] as? String else { return }
             
             self.fetchAccessToken(clientID, clientSecret: clientSecret, code: existingCode) { [unowned self] (result) -> () in
                 switch result {
-                case let .Success(receivedAccessToken):
-                    guard let nonOptAccessToken : String = receivedAccessToken else { return }
-                    self.accessToken = nonOptAccessToken
-                    print("-- accessToken", nonOptAccessToken)
-                    NSNotificationCenter.defaultCenter().postNotificationName("StravaAPIHasAccessToken", object: nil, userInfo: ["accessToken":nonOptAccessToken])
-                case let .Failure(error):
+                case let .success(receivedAccessToken):
+                    self.accessToken = receivedAccessToken
+                    print("-- accessToken", receivedAccessToken)
+                    NotificationCenter.default.post(name: Notification.Name(rawValue: "StravaAPIHasAccessToken"), object: nil, userInfo: ["accessToken":receivedAccessToken])
+                case let .failure(error):
                     print(error)
                 }
             }
@@ -128,91 +127,92 @@ public class StravaAPI {
     }
     
     deinit {
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: "CodeWasReceived", object: nil)
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: "CodeWasReceived"), object: nil)
     }
     
-    public func fetchAthlete(completionHandler: (Result<Athlete>) -> ()) {
+    open func fetchAthlete(_ completionHandler: @escaping (Result<Athlete>) -> ()) {
         
         let urlString = "https://www.strava.com/api/v3/athlete" + accessTokenURLSuffix()
-        let url = NSURL(string: urlString)
-        let request = NSURLRequest(URL: url!)
+        let url = URL(string: urlString)
+        let request = URLRequest(url: url!)
         
         request.dr2_fetchTypedJSON([String:AnyObject].self) {
             do {
                 let (_, d) = try $0()
                 if let errors = d["errors"] {
-                    let e = NSError(domain: "STStrava", code: StravaAPI.BadJSON._code, userInfo: [NSLocalizedDescriptionKey:String(errors)])
-                    completionHandler(.Failure(e))
+                    let e = NSError(domain: "STStrava", code: StravaAPI.badJSON._code, userInfo: [NSLocalizedDescriptionKey:String(describing:errors)])
+                    completionHandler(.failure(e))
                     return
                 }
                 
                 if let athlete = Athlete(fromAthleteDictionary: d) {
-                    completionHandler(.Success(athlete))
+                    completionHandler(.success(athlete))
                 } else {
-                    let e = NSError(domain: "STStrava", code: StravaAPI.BadJSON._code, userInfo: [NSLocalizedDescriptionKey:"Bad JSON"])
-                    completionHandler(.Failure(e))
+                    let e = NSError(domain: "STStrava", code: StravaAPI.badJSON._code, userInfo: [NSLocalizedDescriptionKey:"Bad JSON"])
+                    completionHandler(.failure(e))
                 }
             } catch let e as NSError {
-                completionHandler(.Failure(e))
+                completionHandler(.failure(e))
             }
         }
     }
     
-    public func fetchActivities(completionHandler: (Result<[Activity]>) -> ()) {
+    open func fetchActivities(_ completionHandler: @escaping (Result<[Activity]>) -> ()) {
         
         let urlString = "https://www.strava.com/api/v3/activities" + accessTokenURLSuffix() + "&per_page=200"
-        let url = NSURL(string: urlString)
-        let request = NSURLRequest(URL: url!)
+        let url = URL(string: urlString)
+        let request = URLRequest(url: url!)
         
         request.dr2_fetchTypedJSON([[String:AnyObject]].self) {
             do {
                 let (_, a) = try $0()
                 let runActivities = self.sortedRunActivitiesFromJSONArray(a)
-                completionHandler(.Success(runActivities))
-            } catch let DRError.Error(r, nsError) {
+                completionHandler(.success(runActivities))
+            } catch let DRError.error(r, nsError) {
                 
                 // try to read a Strava error
                 
                 if let data = r.data,
-                    d = try? NSJSONSerialization.JSONObjectWithData(data, options: []),
-                    message = d["message"] as? String,
-                    errors = d["errors"] as? [[String:AnyObject]] {
+                let optDict = try? JSONSerialization.jsonObject(with: data, options: []) as? [String:AnyObject],
+                    let d = optDict,
+                    let message = d["message"] as? String,
+                    let errors = d["errors"] as? [[String:AnyObject]] {
                     print("-- ", d)
                 
                     // build a custom NSError
                     let userInfo = [NSLocalizedDescriptionKey:"\(message) - \(errors)"]
                     let e = NSError(domain: "Strava", code: 0, userInfo: userInfo)
-                    completionHandler(.Failure(e))
+                    completionHandler(.failure(e))
                     return
                 }
                 
-                completionHandler(.Failure(nsError))
+                completionHandler(.failure(nsError))
             } catch {
                 assertionFailure()
             }
         }
     }
     
-    public func hasAccessToken() -> Bool {
+    open func hasAccessToken() -> Bool {
         return self.accessToken != nil
     }
     
-    public func forgetAccessToken() {
+    open func forgetAccessToken() {
         self.accessToken = nil
     }
     
-    public func startAuthorizationProcess(redirectURI redirectURI: String) {
+    open func startAuthorizationProcess(redirectURI: String) {
         
         let urlString = "https://www.strava.com/oauth/authorize?client_id=\(clientID)&response_type=code&redirect_uri=\(redirectURI)&approval_prompt=force"
-        let url = NSURL(string: urlString)
+        let url = URL(string: urlString)
         
         if let existingURL = url {
             // notification instead of direct opening so that this class doesn't depend on UIKit
-            NSNotificationCenter.defaultCenter().postNotificationName("OpenURL", object: nil, userInfo: ["URL":existingURL])
+            NotificationCenter.default.post(name: Notification.Name(rawValue: "OpenURL"), object: nil, userInfo: ["URL":existingURL])
         }
     }
     
-    private func fetchAccessToken(clientID: String, clientSecret: String, code: String, completionBlock:(Result<String>) -> ()) {
+    fileprivate func fetchAccessToken(_ clientID: String, clientSecret: String, code: String, completionBlock:@escaping (Result<String>) -> ()) {
         
         /*
         curl -X POST https://www.strava.com/oauth/token \
@@ -221,92 +221,95 @@ public class StravaAPI {
         -F code=333
         */
         
-        let url = NSURL(string: "https://www.strava.com/oauth/token")!
-        let request = NSMutableURLRequest(URL: url)
-        request.HTTPMethod = "POST"
+        let url = URL(string: "https://www.strava.com/oauth/token")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
         let body = "client_id=\(clientID)&client_secret=\(clientSecret)&code=\(code)"
-        request.HTTPBody = body.dataUsingEncoding(NSUTF8StringEncoding);
+        request.httpBody = body.data(using: String.Encoding.utf8);
         
         request.dr2_fetchTypedJSON([String:AnyObject].self) {
             do {
                 let (_, d) = try $0()
 
                 guard let receivedExistingAccessToken = d["access_token"] as? String else {
-                    let e = NSError(domain: "STStrava", code: StravaAPI.BadJSON._code, userInfo: [NSLocalizedDescriptionKey:"Bad JSON"])
-                    completionBlock(.Failure(e))
+                    let e = NSError(domain: "STStrava", code: StravaAPI.badJSON._code, userInfo: [NSLocalizedDescriptionKey:"Bad JSON"])
+                    completionBlock(.failure(e))
                     return
                 }
-                completionBlock(.Success(receivedExistingAccessToken))
+                completionBlock(.success(receivedExistingAccessToken))
             } catch let e as NSError {
-                completionBlock(.Failure(e))
+                completionBlock(.failure(e))
             }
         }
     }
     
-    private func accessTokenURLSuffix() -> String {
+    fileprivate func accessTokenURLSuffix() -> String {
         if let existingAccessToken = self.accessToken {
             return "?access_token=" + existingAccessToken
         }
         return ""
     }
     
-    private func sortedRunActivitiesFromJSONArray(a:NSArray) -> [Activity] {
+    fileprivate func sortedRunActivitiesFromJSONArray(_ a:[[String:AnyObject]]) -> [Activity] {
         return a
-            .flatMap( { $0 as? NSDictionary })
+            .flatMap( { $0 })
             .flatMap( { Activity(fromActivityDictionary:$0) })
             .filter{ $0.type == "Run" }
-            .sort({ $0.date.compare($1.date) == NSComparisonResult.OrderedAscending })
+            .sorted(by: { $0.date.compare($1.date) == ComparisonResult.orderedAscending })
     }
     
-    public func fetchFriendsActivities(athleteID: Int, completionHandler: (Result<[Activity]>) -> ()) {
+    open func fetchFriendsActivities(_ athleteID: Int, completionHandler: @escaping (Result<[Activity]>) -> ()) {
         
         let urlString = "https://www.strava.com/api/v3/activities/following" + accessTokenURLSuffix()
-        let url = NSURL(string: urlString)
-        let request = NSURLRequest(URL: url!)
+        let url = URL(string: urlString)
+        let request = URLRequest(url: url!)
         
         request.dr2_fetchTypedJSON([[String:AnyObject]].self) {
             do {
                 let (_, a) = try $0()
                 let runActivitiesFromSpecificFriend = self.sortedRunActivitiesFromJSONArray(a).filter{ $0.athlete?.id == athleteID }
-                completionHandler(.Success(runActivitiesFromSpecificFriend))
+                completionHandler(.success(runActivitiesFromSpecificFriend))
             } catch let e as NSError {
-                completionHandler(.Failure(e))
+                completionHandler(.failure(e))
             }
         }
     }
     
-    private func fetchActivity(activityID: String, completionHandler: (Result<Activity>) -> ()) {
+    fileprivate func fetchActivity(_ activityID: String, completionHandler: @escaping (Result<Activity>) -> ()) {
         
         let urlString = "https://www.strava.com/api/v3/activities/\(activityID)" + accessTokenURLSuffix()
-        let url = NSURL(string: urlString)
-        let request = NSURLRequest(URL: url!)
+        let url = URL(string: urlString)
+        let request = URLRequest(url: url!)
         
-        request.dr2_fetchTypedJSON(NSDictionary.self) {
+        request.dr2_fetchTypedJSON([String:AnyObject].self) {
             do {
                 let (_, d) = try $0()
                 
                 if let activity = Activity(fromActivityDictionary: d) {
-                    completionHandler(.Success(activity))
+                    completionHandler(.success(activity))
                 } else {
-                    let e = NSError(domain: "STStrava", code: StravaAPI.BadJSON._code, userInfo: [NSLocalizedDescriptionKey:"Bad JSON"])
-                    completionHandler(.Failure(e))
+                    let e = NSError(domain: "STStrava", code: StravaAPI.badJSON._code, userInfo: [NSLocalizedDescriptionKey:"Bad JSON"])
+                    completionHandler(.failure(e))
                 }
                 
             } catch let e as NSError {
-                completionHandler(.Failure(e))
+                completionHandler(.failure(e))
             }
         }
     }
     
-    private func maxElevationGain(shortActivities:[Activity]) -> NSNumber {
-        return shortActivities.minElement({ $0.elevationGain > $1.elevationGain })!.elevationGain
+    fileprivate func maxElevationGain(_ shortActivities:[Activity]) -> NSNumber {
+        let x = shortActivities.min(by: { $0.elevationGain > $1.elevationGain })!.elevationGain
+        return NSNumber(value:x)
     }
     
-    private func maxMeters(shortActivities:[Activity]) -> NSNumber {
-        return shortActivities.minElement({ $0.meters > $1.meters })!.meters
+    fileprivate func maxMeters(_ shortActivities:[Activity]) -> NSNumber {
+        let x = shortActivities.min(by: { $0.meters > $1.meters })!.meters
+        return NSNumber(value:x)
     }
     
-    private func maxSeconds(shortActivities:[Activity]) -> NSNumber {
-        return shortActivities.minElement({ $0.seconds > $1.seconds })!.seconds
+    fileprivate func maxSeconds(_ shortActivities:[Activity]) -> NSNumber {
+        let x = shortActivities.min(by: { $0.seconds > $1.seconds })!.seconds
+        return NSNumber(value:x)
     }
 }

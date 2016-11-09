@@ -1,3 +1,0 @@
-[submodule "submodules/HTTPRequests"]
-	path = submodules/HTTPRequests
-	url = https://github.com/nst/HTTPRequests
